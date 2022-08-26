@@ -5,17 +5,24 @@
 host: capsule1
 install_iso: /var/lib/libvirt/images/rhel-8.6-x86_64-dvd.iso
 os_variant: rhel8.5
-# sizes in GiB
+# size in MiB
 ram: 16384
-disk_size: 60
 
-# kickstart
-fqdn: "{{ host }}.lab.example.com"
-user: nick
-# partition for LVM, sizes in MiB
+# storage
+# size in GiB
+disk_size: 100
+# partitions
+# 1 for /boot/efi                600M
+# 2 for /boot                    1024M
+# 3 LVM Physical Volume          90G * 1024 = 92160M
+# LVM
 pv_size: 276480
+# LVM logical volume for /root   13G * 1024 = 13312M
+# LVM logical volume for /var    75G * 1024 = 76800M
 lv_var: 245760
+# LVM volume for swap: 256M
 
+# network
 # MAC addresses are listed here.
 #   https://hardiman.consulting/rhel/9/set-up/host1-libvirt-network.html
 nics:
@@ -25,9 +32,11 @@ nics:
   net: public0
 - 
   name: enp2s0
-  mac:"52:54:00:01:00:05"
+  mac: "52:54:00:01:00:05"
   net: private0
 
+# kickstart
+fqdn: "{{ host }}.lab.example.com"
 # RHSM
 # Probably safer to provide these on the command line with options like --extra-var="rhsm_name=nick"
 # rather than set values here. 
@@ -39,7 +48,8 @@ rhsm_pool: my_subscription_pool_id
 inventory: "./inventory.ini"
 remote_user: ansible_user
 private_key_file: "/home/{{ user }}/.ssh/ansible-key.priv"
-# In the real world, this password would be protected with encryption.
+# In the real world, a password would be protected.
+# It would be encrypted, managed by a vault service, or stored away from git.
 # see 
 # https://docs.ansible.com/ansible/latest/user_guide/vault.html#encrypting-individual-variables-with-ansible-vault
 user_ansible_pass: Password;1

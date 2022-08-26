@@ -1,12 +1,10 @@
 ---
 - name: build new machine
-  hosts: host3
+  hosts: host2
   become: yes
   gather_facts: no
   roles: 
   - role: libvirt-guest
-    # !!!
-    ignore_errors: yes
 
 - name: check new machine
   hosts: provisioner
