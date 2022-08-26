@@ -7,7 +7,7 @@
   - role: libvirt-guest
 
 - name: check new machine
-  hosts: provisioner
+  hosts: capsule1
   become: no
   gather_facts: no
   tasks:

@@ -6,7 +6,7 @@
 - hosts: localhost
   become: yes
   vars:
-    host: satellite1
+    host: capsule1
   tasks:  
 
   # https://github.com/ansible-collections/community.libvirt/issues/40

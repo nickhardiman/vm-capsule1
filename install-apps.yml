@@ -1,5 +1,5 @@
 - name: install the foundation
-  hosts: provisioner
+  hosts: capsule1
   become: yes
   # override user password for privilege escalation.
   # ansible already has a become password for localhost.
