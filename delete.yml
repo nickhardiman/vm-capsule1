@@ -1,6 +1,6 @@
 # run
 #   ansible-playbook  --ask-become-pass  delete.yml
-#   ansible-playbook  --become-password-file=~/my_pass --extra-var='host=some_host' delete.yml
+#   ansible-playbook  --become-password-file=~/my-pass --extra-var='host=some_host' delete.yml
 #
 # remove the virtual machine
 - hosts: localhost

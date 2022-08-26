@@ -16,10 +16,10 @@ disk_size: 100
 # 2 for /boot                    1024M
 # 3 LVM Physical Volume          90G * 1024 = 92160M
 # LVM
-pv_size: 276480
+pv_size: 92160
 # LVM logical volume for /root   13G * 1024 = 13312M
 # LVM logical volume for /var    75G * 1024 = 76800M
-lv_var: 245760
+lv_var: 76800
 # LVM volume for swap: 256M
 
 # network
