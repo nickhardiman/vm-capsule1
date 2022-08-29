@@ -7,7 +7,7 @@
   - role: libvirt-guest
 
 - name: check new machine
-  hosts: capsule1
+  hosts: capsule1.lab.example.com
   become: no
   gather_facts: no
   tasks:
