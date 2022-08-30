@@ -11,34 +11,6 @@
 # similar to Satellite?
 # something like 
 #
-#  register and update
-# subscription-manager register someguy somepass
-# dnf update
-# systemctl reboot
-#
-#  find the Satellite pool ID and subscribe
-# subscription-manager list --all --available > subscription-manager-list--all--available.txt
-# grep 'Red Hat Satellite Infrastructure Subscription' subscription-manager-list--all--available.txt 
-# subscription-manager attach --pool=12345
-# or maybe
-# subscription-manager list  --all --available  \
-#   --matches 'Red Hat Satellite Infrastructure Subscription' | grep 'Pool ID'
-#
-#  use RHEL 8 and Satellite 6.11 repos 
-# subscription-manager repos --list  > subscription-manager-repos--list.txt
-# grep satellite subscription-manager-repos--list.txt | grep 6.11
-# subscription-manager repos --disable "*"
-# subscription-manager repos \
-#   --enable=rhel-8-for-x86_64-baseos-rpms \
-#   --enable=rhel-8-for-x86_64-appstream-rpms \
-#   --enable=satellite-6.11-for-rhel-8-x86_64-rpms \
-#   --enable=satellite-maintenance-6.11-for-rhel-8-x86_64-rpms
-#
-#  install RPM packages
-# dnf install sos
-# yum module enable satellite:el8
-# yum install satellite
-#
 # DNS
 #
 # firewall
@@ -47,24 +19,48 @@
 # firewall-cmd --permanent --add-service=https
 # firewall-cmd --reload
 #
-# checks
-# hostnamectl status
-# getenforce
-# systemctl status chronyd
-# ping -c1 localhost
-# ping -c1 $(hostname -s)
-# ping -c1 $(hostname -f)
-# dig -x 1.2.3.4
-
-# set up Satellite
-# satellite-installer \
-#   --scenario satellite \
-#   --foreman-initial-admin-username someguy \
-#   --foreman-initial-admin-password somepass
+# capsule register and update
+# subscription-manager register someguy somepass
+# dnf update
+# systemctl reboot
 #
+# satellite
+# create content view with repos
+#  rhel-8-for-x86_64-appstream-rpms                  Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)
+#  rhel-8-for-x86_64-baseos-rpms                     Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)
+#  satellite-capsule-6.11-for-rhel-8-x86_64-rpms     Red Hat Satellite Capsule 6.11 for RHEL 8 x86_64 (RPMs)
+#  satellite-maintenance-6.11-for-rhel-8-x86_64-rpms Red Hat Satellite Maintenance 6.11 for RHEL 8 x86_64 (RPMs)
+# not convinced this one is needed
+#  satellite-utils-6.11-for-rhel-8-x86_64-rpms    
+# 
+# create activation key with content view
+#
+# create /root/.ssh/id_rsa.pub 
+# copy /root/.ssh/id_rsa.pub to capsule1:/root/.ssh/authorized_keys 
+#
+# capsule
+# ??? subscription-manager unregister
+# subscription-manager register --activationkey rhel8actkey --org 'myorg'
+#  install RPM packages
+# dnf module enable satellite-capsule:el8
+# dnf install satellite-capsule
+#
+# satellite
+# mkdir /root/capsule_cert
+# capsule-certs-generate --foreman-proxy-fqdn capsule1.lab.example.com --certs-tar /root/capsule_cert/capsule_certs.tar
+# copy satellite-installer command
+# scp /root/capsule_cert/capsule_certs.tar root@capsule1.lab.example.com:/root/capsule_certs.tar
+#
+# capsule
+# run satellite-installer command
+#
+# satellite
+# fix org and location
+# sync content
+# hammer capsule content synchronize  --name capsule1.lab.example.com
+#
+# capsule
 # checks
 # satellite-maintain service list
 # satellite-maintain health check
-# hammer ping
-
 
