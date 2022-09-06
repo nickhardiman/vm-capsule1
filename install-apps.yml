@@ -39,9 +39,10 @@
       timeout: 30
 
 # network manager
+  # first interface
   # CLI commands
   # community.general.nmcli and rhel-system-roles.network being a PITA
-  - name: change the property of a setting
+  - name: change first interface
     ansible.builtin.command:
       cmd: "{{ item }}"
     loop:
@@ -49,4 +50,13 @@
       - nmcli con mod enp1s0 ipv4.ignore-auto-dns yes
       - nmcli con up enp1s0
 
+  # second interface on private2
+  # This network is for provisioning machines
+  - name: change second interface
+    ansible.builtin.command:
+      cmd: "{{ item }}"
+    loop:
+      - nmcli con mod enp2s0  ipv4.addresses 192.168.132.5/24
+      - nmcli con mod enp2s0  ipv4.method    manual
+      - nmcli con up enp2s0
 
