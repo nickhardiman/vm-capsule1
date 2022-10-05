@@ -1,0 +1,62 @@
+- name: install the foundation
+  hosts: provisioner
+  become: yes
+  # override user password for privilege escalation.
+  # ansible already has a become password for localhost.
+  # this new host has a different become password.
+  # By the time the role is finished, user has passwordless sudo and this is no longer needed.
+  vars:
+    ansible_become_password: "{{ user_ansible_password }}"
+  gather_facts: no
+  roles:
+    - ansible-target
+
+
+  tasks:
+
+# checks
+  - name: can ansible contact the machine?
+    ping:
+  - name: is the machine registered?
+    ansible.builtin.command:
+      cmd: /sbin/subscription-manager status
+
+
+# upgrade and reboot
+
+  # make sure the new machine has been rebooted before upgrading all packages
+  # If kickstart failed to register with RHSM, this module does nothing.
+  - name: Upgrade all packages
+    ansible.builtin.dnf:
+      name: "*"
+      state: latest
+
+# checks
+  - name: can the OS survive another reboot? 
+    ansible.builtin.reboot:
+  - name: can we ping the host after the reboot?
+    ansible.builtin.wait_for_connection:
+      timeout: 30
+
+# network manager
+  # first interface
+  # CLI commands
+  # community.general.nmcli and rhel-system-roles.network being a PITA
+  - name: change first interface
+    ansible.builtin.command:
+      cmd: "{{ item }}"
+    loop:
+      - nmcli con mod enp1s0 ipv4.dns 192.168.1.12
+      - nmcli con mod enp1s0 ipv4.ignore-auto-dns yes
+      - nmcli con up enp1s0
+
+  # second interface on private2
+  # This network is for provisioning machines
+  - name: change second interface
+    ansible.builtin.command:
+      cmd: "{{ item }}"
+    loop:
+      - nmcli con mod enp2s0  ipv4.addresses 192.168.132.5/24
+      - nmcli con mod enp2s0  ipv4.method    manual
+      - nmcli con up enp2s0
+
