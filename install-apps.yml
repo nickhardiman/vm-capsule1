@@ -9,6 +9,15 @@
       msg: err.....
 
 # similar to Satellite?
+#
+# server certificate missing from this.
+# https://access.redhat.com/documentation/en-us/red_hat_satellite/6.11/html/installing_capsule_server/installing-capsule-server#configuring-capsule-server-with-ssl-certificates
+# katello-certs-check \
+#   -t capsule  \
+#   -c /etc/pki/tls/certs/capsule1.lab.example.com.pem \
+#   -k /etc/pki/tls/private/capsule1.lab.example.com.key  \
+#   -b /etc/pki/ca-trust/source/anchors/ca-certificate.pem
+#
 # something like 
 #
 # DNS
@@ -46,13 +55,35 @@
 # dnf install satellite-capsule
 #
 # satellite
-# mkdir /root/capsule_cert
-# capsule-certs-generate --foreman-proxy-fqdn capsule1.lab.example.com --certs-tar /root/capsule_cert/capsule_certs.tar
+#   mkdir /root/capsule_cert
+#   CAPSULE=capsule1.lab.example.com
+#   scp $CAPSULE:/etc/pki/tls/certs/$CAPSULE.pem /etc/pki/tls/certs/$CAPSULE.pem
+#   scp $CAPSULE:/etc/pki/tls/private/$CAPSULE.key /etc/pki/tls/private/$CAPSULE.key
+# run certificate generation command
+# see --certs-update-server for renewal
+# adds many files in /root/ssl-build/capsule1.lab.example.com/
+#   capsule-certs-generate \
+#     --foreman-proxy-fqdn "$CAPSULE" \
+#     --certs-tar  "~/$CAPSULE-certs.tar" \
+#     --server-cert "/etc/pki/tls/certs/$CAPSULE.pem" \
+#     --server-key "/etc/pki/tls/private/$CAPSULE.key" \
+#     --server-ca-cert "/etc/pki/ca-trust/source/anchors/ca-certificate.pem" 
+
 # copy satellite-installer command
-# scp /root/capsule_cert/capsule_certs.tar root@capsule1.lab.example.com:/root/capsule_certs.tar
+# scp ~/$CAPSULE-certs.tar root@capsule1.lab.example.com:~/$CAPSULE-certs.tar
 #
 # capsule
 # run satellite-installer command
+#   satellite-installer \
+#     --scenario capsule \
+#     --certs-tar-file                              "/root/capsule1.lab.example.com-certs.tar"\
+#     --foreman-proxy-register-in-foreman           "true"\
+#     --foreman-proxy-foreman-base-url              "https://satellite1.lab.example.com"\
+#     --foreman-proxy-trusted-hosts                 "satellite1.lab.example.com"\
+#     --foreman-proxy-trusted-hosts                 "capsule1.lab.example.com"\
+#     --foreman-proxy-oauth-consumer-key            "T5GYnDeyWMzwX4hkj9B7SCYrL63BxXCc"\
+#     --foreman-proxy-oauth-consumer-secret         "myDfuvGSLqbRhXrwUbMc6ESa4fZhfjDj"
+
 #
 # satellite
 # fix org and location

@@ -60,3 +60,17 @@
       - nmcli con mod enp2s0  ipv4.method    manual
       - nmcli con up enp2s0
 
+# firewall
+  - name: permit traffic in default zone
+    ansible.posix.firewalld:
+      service: "{{ item }}"
+      immediate: yes
+      permanent: yes
+      state: enabled
+    loop:
+      #- cockpit # port 9090 interferes with capsule
+      - http
+      - https
+      - RH-Satellite-6
+      - ssh
+
